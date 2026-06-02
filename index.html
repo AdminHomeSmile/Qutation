@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Qutation - ใบเสนอราคา</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <section id="loginSection" class="card center-card">
+        <h1>Qutation</h1>
+        <p class="muted">เข้าสู่ระบบเพื่อเริ่มทำใบเสนอราคา</p>
+        <div class="grid one">
+          <label>ชื่อผู้ใช้งาน
+            <input id="loginName" type="text" placeholder="เช่น Somchai ฝ่ายขาย" />
+          </label>
+          <button id="loginBtn" class="btn btn-primary">เข้าสู่ระบบ</button>
+        </div>
+      </section>
+
+      <section id="mainSection" class="hidden">
+        <header class="topbar card">
+          <div>
+            <h2>ระบบใบเสนอราคา</h2>
+            <p class="muted">ผู้ใช้งาน: <span id="currentUser">-</span></p>
+          </div>
+          <div class="actions">
+            <button id="tabQuote" class="btn btn-primary">ทำใบเสนอราคา</button>
+            <button id="tabDashboard" class="btn">แดชบอร์ดรายงาน</button>
+            <button id="logoutBtn" class="btn btn-danger">ออกจากระบบ</button>
+          </div>
+        </header>
+
+        <section id="quoteView" class="card">
+          <h3>ฟอร์มใบเสนอราคา</h3>
+          <div class="grid three">
+            <label>เลขที่เอกสาร
+              <input id="quoteNumber" type="text" readonly placeholder="บันทึกแล้วระบบจะรันเลขให้อัตโนมัติ" />
+            </label>
+            <label>วันที่
+              <input id="quoteDate" type="date" />
+            </label>
+            <label>ประเภทการขาย
+              <select id="saleType">
+                <option value="direct">ขายตรง (QTC)</option>
+                <option value="agent">ผ่านเอเจนต์ (QTD)</option>
+              </select>
+            </label>
+          </div>
+
+          <fieldset>
+            <legend>ลูกค้า</legend>
+            <div class="grid three">
+              <label>เลือกลูกค้า
+                <select id="customerSelect"></select>
+              </label>
+              <label>ชื่อลูกค้า
+                <input id="customerName" type="text" />
+              </label>
+              <label>ประเภทลูกค้า
+                <select id="customerType">
+                  <option value="general">ทั่วไป</option>
+                  <option value="company">บริษัท</option>
+                </select>
+              </label>
+              <label class="span-two">ที่อยู่
+                <input id="customerAddress" type="text" />
+              </label>
+              <label>รหัสผู้เสียภาษี
+                <input id="customerTaxId" type="text" placeholder="เลขประจำตัวผู้เสียภาษี" />
+              </label>
+              <label class="span-two">ชื่อและที่อยู่ในการออกใบกำกับภาษี
+                <input id="invoiceAddress" type="text" />
+              </label>
+              <label class="span-two">ชื่อโครงการ
+                <input id="projectName" type="text" />
+              </label>
+              <label>สถานที่จัดส่ง
+                <input id="deliveryLocation" type="text" />
+              </label>
+              <div class="inline-actions">
+                <button id="addCustomerBtn" class="btn">เพิ่ม/อัปเดตลูกค้า</button>
+                <button id="removeCustomerBtn" class="btn btn-danger">ลบลูกค้า</button>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>รายการสินค้า</legend>
+            <div class="table-wrap">
+              <table id="itemsTable">
+                <thead>
+                  <tr>
+                    <th>สินค้า</th>
+                    <th>จำนวน</th>
+                    <th>ราคาทุน</th>
+                    <th>ราคาขาย</th>
+                    <th>ส่วนลดต่อรายการ</th>
+                    <th>รวมสุทธิ</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="itemsBody"></tbody>
+              </table>
+            </div>
+            <button id="addItemBtn" class="btn">+ เพิ่มสินค้า</button>
+            <p id="costWarning" class="warning hidden">พบราคาขายต่ำกว่าทุน: ต้องส่งอนุมัติก่อนบันทึก</p>
+          </fieldset>
+
+          <fieldset>
+            <legend>ส่วนลดระดับเอกสาร</legend>
+            <div id="agentDiscountBlock" class="grid two hidden">
+              <label>ส่วนลดเอเจนต์
+                <div class="discount-row">
+                  <select id="agentDiscountType">
+                    <option value="none">ไม่ใช้</option>
+                    <option value="percent">%</option>
+                    <option value="amount">บาท</option>
+                  </select>
+                  <input id="agentDiscountValue" type="number" min="0" step="0.01" value="0" />
+                </div>
+              </label>
+            </div>
+            <div class="grid two">
+              <label>ส่วนลดลูกค้า
+                <div class="discount-row">
+                  <select id="customerDiscountType">
+                    <option value="none">ไม่ใช้</option>
+                    <option value="percent">%</option>
+                    <option value="amount">บาท</option>
+                  </select>
+                  <input id="customerDiscountValue" type="number" min="0" step="0.01" value="0" />
+                </div>
+              </label>
+              <label>VAT (%)
+                <input id="vatRate" type="number" min="0" step="0.01" value="7" />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>เครดิต / ชำระเงิน / เงื่อนไข</legend>
+            <div class="grid three">
+              <label>เครดิต
+                <select id="creditTerm">
+                  <option>7 วัน</option>
+                  <option>15 วัน</option>
+                  <option selected>30 วัน</option>
+                  <option>60 วัน</option>
+                  <option>90 วัน</option>
+                  <option>เงินสด</option>
+                </select>
+              </label>
+              <label>วิธีชำระเงิน
+                <select id="paymentMethod">
+                  <option>โอนผ่านบัญชี</option>
+                  <option>รูดบัตร</option>
+                  <option>เงินสด</option>
+                </select>
+              </label>
+              <label>
+                <input id="includeShipping" type="checkbox" checked /> รวมเงื่อนไขการขนส่ง
+              </label>
+            </div>
+            <div class="grid two">
+              <label>เงื่อนไขที่ 1
+                <textarea id="condition1" rows="2">ราคานี้รวมภาษีมูลค่าเพิ่มแล้ว</textarea>
+              </label>
+              <label>เงื่อนไขที่ 2
+                <textarea id="condition2" rows="2">สินค้ารับประกันตามเงื่อนไขบริษัท</textarea>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>การอนุมัติ</legend>
+            <div class="grid three">
+              <label>ผู้จัดทำเอกสาร
+                <input id="preparedBy" type="text" />
+              </label>
+              <label>ชื่อเซลล์
+                <input id="salesName" type="text" />
+              </label>
+              <label>ผู้อนุมัติ
+                <input id="approverName" type="text" />
+              </label>
+            </div>
+            <div class="inline-actions">
+              <label><input id="approvalSent" type="checkbox" /> ส่งอนุมัติแล้ว</label>
+              <label><input id="approvalGranted" type="checkbox" /> อนุมัติแล้ว</label>
+              <button id="sendApprovalBtn" class="btn">ส่งอนุมัติ</button>
+            </div>
+          </fieldset>
+
+          <section class="summary card soft">
+            <h4>สรุปราคา</h4>
+            <p>รวมก่อนส่วนลด: <strong id="subtotalText">0.00</strong> บาท</p>
+            <p id="agentDiscountText" class="hidden">ส่วนลดเอเจนต์: <strong>0.00</strong> บาท</p>
+            <p id="customerDiscountText" class="hidden">ส่วนลดลูกค้า: <strong>0.00</strong> บาท</p>
+            <p>ก่อน VAT: <strong id="beforeVatText">0.00</strong> บาท</p>
+            <p>VAT: <strong id="vatText">0.00</strong> บาท</p>
+            <p class="final">ราคาสุทธิรวม: <strong id="grandTotalText">0.00</strong> บาท</p>
+          </section>
+
+          <div class="actions">
+            <button id="saveQuoteBtn" class="btn btn-primary">บันทึกใบเสนอราคา</button>
+            <button id="printBtn" class="btn">พิมพ์ / บันทึก PDF</button>
+          </div>
+
+          <section id="quotePaper" class="quote-paper">
+            <div class="paper-head">
+              <div class="paper-company">
+                <h4>บริษัท เอสซีจี ดิสทริบิวชั่น จำกัด (สำนักงานใหญ่)</h4>
+                <p>เลขที่ 1 ถนนปูนซิเมนต์ไทย แขวงบางซื่อ เขตบางซื่อ กรุงเทพมหานคร 10800</p>
+                <p><strong>SCG Distribution Co., Ltd. (Head Office)</strong></p>
+                <p>1 Siam Cement Road., Bangsue, Bangkok 10800</p>
+              </div>
+              <div class="paper-title">
+                <div>ใบเสนอราคา</div>
+                <div>QUOTATION</div>
+                <div>(ฉบับลูกค้า)</div>
+              </div>
+            </div>
+
+            <table class="paper-meta">
+              <tr>
+                <td>ชื่อลูกค้า <span id="printCustomerName">-</span></td>
+                <td>วันที่เสนอราคา : <span id="printQuoteDate">-</span></td>
+                <td>Code No : <span id="printQuoteNumber">-</span></td>
+              </tr>
+              <tr>
+                <td>ชื่อและที่อยู่ในการออกใบกำกับภาษี <span id="printInvoiceAddress">-</span></td>
+                <td colspan="2">ชื่อโครงการ : <span id="printProjectName">-</span></td>
+              </tr>
+              <tr>
+                <td>รหัสผู้เสียภาษี <span id="printCustomerTaxId">-</span></td>
+                <td colspan="2">สถานที่จัดส่ง : <span id="printDeliveryLocation">-</span></td>
+              </tr>
+            </table>
+
+            <table class="paper-items">
+              <thead>
+                <tr>
+                  <th style="width:50px">No.</th>
+                  <th>รายการสินค้า / List of Products</th>
+                  <th style="width:90px">ปริมาณ</th>
+                  <th style="width:90px">หน่วย</th>
+                  <th style="width:130px">ราคาต่อหน่วย</th>
+                  <th style="width:130px">จำนวนเงิน</th>
+                </tr>
+              </thead>
+              <tbody id="printItemsBody"></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2"><strong>รวม <span id="printItemsCount">0</span> รายการ</strong></td>
+                  <td colspan="3">รวมมูลค่าสินค้า (บาท) TOTAL AMOUNT EXC.Vat</td>
+                  <td class="num" id="printSubtotal">0.00</td>
+                </tr>
+                <tr>
+                  <td colspan="5">ภาษีมูลค่าเพิ่ม (บาท) อัตรา <span id="printVatRate">7</span>% VAT</td>
+                  <td class="num" id="printVat">0.00</td>
+                </tr>
+                <tr>
+                  <td colspan="5"><strong>รวมเงินทั้งสิ้น (บาท) GRAND TOTAL</strong></td>
+                  <td class="num" id="printGrandTotal">0.00</td>
+                </tr>
+              </tfoot>
+            </table>
+
+            <div class="paper-total-text">รวมเงินทั้งสิ้น GRAND TOTAL : <strong id="printAmountText">ศูนย์บาทถ้วน</strong></div>
+
+            <div class="paper-terms">
+              <p><strong>เงื่อนไขการสั่งซื้อ</strong></p>
+              <p>1) กรุณาแจ้งคำสั่งซื้อและยืนยันภายใน 3 วันทำการ</p>
+              <p>2) ราคานี้ยังไม่รวมภาษีมูลค่าเพิ่ม 7% (หากไม่มีการระบุเป็นอย่างอื่น)</p>
+              <p>3) บริษัทขอสงวนสิทธิ์ในการเปลี่ยนแปลงราคาและเงื่อนไขโดยไม่ต้องแจ้งล่วงหน้า</p>
+              <p>4) กรุณาตรวจสอบรายละเอียดสินค้าและเงื่อนไขก่อนยืนยันคำสั่งซื้อทุกครั้ง</p>
+              <p><strong>เงื่อนไขการชำระเงิน:</strong> <span id="printPaymentMethod">-</span> / เครดิต <span id="printCreditTerm">-</span></p>
+            </div>
+
+            <div class="paper-sign">
+              <div class="sign-box">
+                <div class="line"></div>
+                <p>ผู้เสนอใบเสนอราคา</p>
+                <p id="printPreparedBy">-</p>
+              </div>
+              <div class="sign-box">
+                <div class="line"></div>
+                <p>ผู้มีอำนาจอนุมัติใบเสนอราคา</p>
+                <p id="printApproverName">-</p>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section id="dashboardView" class="card hidden">
+          <h3>แดชบอร์ดรายงาน</h3>
+          <div class="grid three">
+            <div class="metric"><span>จำนวนใบเสนอราคาวันนี้</span><strong id="dailyCount">0</strong></div>
+            <div class="metric"><span>มูลค่าวันนี้</span><strong id="dailyTotal">0.00</strong></div>
+            <div class="metric"><span>จำนวนเดือนนี้</span><strong id="monthlyCount">0</strong></div>
+            <div class="metric"><span>มูลค่าเดือนนี้</span><strong id="monthlyTotal">0.00</strong></div>
+            <div class="metric"><span>จำนวนทั้งหมด</span><strong id="allCount">0</strong></div>
+            <div class="metric"><span>มูลค่าทั้งหมด</span><strong id="allTotal">0.00</strong></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>เลขที่</th><th>วันที่</th><th>ลูกค้า</th><th>ประเภทขาย</th><th>ยอดสุทธิ</th><th>ผู้จัดทำ</th></tr>
+              </thead>
+              <tbody id="quoteHistoryBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
