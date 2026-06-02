@@ -84,22 +84,85 @@ th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; vertical-ali
 .metric span { color: var(--gray); font-size: 13px; }
 .metric strong { font-size: 20px; }
 
+.quote-paper {
+  margin-top: 20px;
+  border: 1px solid #111;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  background: #fff;
+  font-size: 14px;
+}
+.paper-head {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  border-bottom: 1px solid #111;
+}
+.paper-company { padding: 10px; border-right: 1px solid #111; }
+.paper-company h4 { margin: 0 0 6px; font-size: 18px; }
+.paper-company p { margin: 2px 0; }
+.paper-title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  font-weight: 700;
+  gap: 8px;
+  font-size: 26px;
+}
+.paper-meta, .paper-items {
+  width: 100%;
+  border-collapse: collapse;
+}
+.paper-meta td, .paper-items th, .paper-items td {
+  border: 1px solid #111;
+  padding: 6px 8px;
+  vertical-align: top;
+}
+.paper-items th {
+  text-align: center;
+  font-size: 16px;
+}
+.paper-items td.num { text-align: right; font-weight: 700; }
+.paper-total-text {
+  border-top: 1px solid #111;
+  border-bottom: 1px solid #111;
+  padding: 8px 10px;
+  font-size: 24px;
+  font-weight: 700;
+}
+.paper-terms {
+  padding: 10px;
+  min-height: 280px;
+  border-bottom: 1px solid #111;
+}
+.paper-terms p { margin: 6px 0; }
+.paper-sign {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  padding: 22px;
+}
+.sign-box { text-align: center; }
+.sign-box .line {
+  border-bottom: 1px solid #111;
+  margin: 28px auto 10px;
+  width: 80%;
+}
+
 @media (max-width: 900px) {
   .grid.two, .grid.three { grid-template-columns: 1fr; }
   .span-two { grid-column: span 1; }
+  .paper-head, .paper-sign { grid-template-columns: 1fr; }
+  .paper-company { border-right: 0; border-bottom: 1px solid #111; }
 }
 
 @media print {
-  .topbar, #addItemBtn, .inline-actions button, .actions, #dashboardView, #addCustomerBtn, #removeCustomerBtn, .warning {
+  #mainSection > *:not(#quoteView), #quoteView > *:not(#quotePaper), .topbar, #dashboardView {
     display: none !important;
   }
-  table th:nth-child(3), table td:nth-child(3), table th:last-child, table td:last-child {
-    display: none !important;
-  }
-  #quoteView.hide-discount-print table th:nth-child(5),
-  #quoteView.hide-discount-print table td:nth-child(5) {
-    display: none !important;
-  }
+  #quoteView, #quotePaper { display: block !important; border: 0 !important; padding: 0 !important; margin: 0 !important; }
   body { background: #fff; }
-  .card { box-shadow: none; border-color: #ddd; }
+  .card { box-shadow: none; border-color: #fff; }
+  #app { max-width: 100%; padding: 0; }
 }

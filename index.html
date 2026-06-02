@@ -67,6 +67,18 @@
               <label class="span-two">ที่อยู่
                 <input id="customerAddress" type="text" />
               </label>
+              <label>รหัสผู้เสียภาษี
+                <input id="customerTaxId" type="text" placeholder="เลขประจำตัวผู้เสียภาษี" />
+              </label>
+              <label class="span-two">ชื่อและที่อยู่ในการออกใบกำกับภาษี
+                <input id="invoiceAddress" type="text" />
+              </label>
+              <label class="span-two">ชื่อโครงการ
+                <input id="projectName" type="text" />
+              </label>
+              <label>สถานที่จัดส่ง
+                <input id="deliveryLocation" type="text" />
+              </label>
               <div class="inline-actions">
                 <button id="addCustomerBtn" class="btn">เพิ่ม/อัปเดตลูกค้า</button>
                 <button id="removeCustomerBtn" class="btn btn-danger">ลบลูกค้า</button>
@@ -195,6 +207,91 @@
             <button id="saveQuoteBtn" class="btn btn-primary">บันทึกใบเสนอราคา</button>
             <button id="printBtn" class="btn">พิมพ์ / บันทึก PDF</button>
           </div>
+
+          <section id="quotePaper" class="quote-paper">
+            <div class="paper-head">
+              <div class="paper-company">
+                <h4>บริษัท เอสซีจี ดิสทริบิวชั่น จำกัด (สำนักงานใหญ่)</h4>
+                <p>เลขที่ 1 ถนนปูนซิเมนต์ไทย แขวงบางซื่อ เขตบางซื่อ กรุงเทพมหานคร 10800</p>
+                <p><strong>SCG Distribution Co., Ltd. (Head Office)</strong></p>
+                <p>1 Siam Cement Road., Bangsue, Bangkok 10800</p>
+              </div>
+              <div class="paper-title">
+                <div>ใบเสนอราคา</div>
+                <div>QUOTATION</div>
+                <div>(ฉบับลูกค้า)</div>
+              </div>
+            </div>
+
+            <table class="paper-meta">
+              <tr>
+                <td>ชื่อลูกค้า <span id="printCustomerName">-</span></td>
+                <td>วันที่เสนอราคา : <span id="printQuoteDate">-</span></td>
+                <td>Code No : <span id="printQuoteNumber">-</span></td>
+              </tr>
+              <tr>
+                <td>ชื่อและที่อยู่ในการออกใบกำกับภาษี <span id="printInvoiceAddress">-</span></td>
+                <td colspan="2">ชื่อโครงการ : <span id="printProjectName">-</span></td>
+              </tr>
+              <tr>
+                <td>รหัสผู้เสียภาษี <span id="printCustomerTaxId">-</span></td>
+                <td colspan="2">สถานที่จัดส่ง : <span id="printDeliveryLocation">-</span></td>
+              </tr>
+            </table>
+
+            <table class="paper-items">
+              <thead>
+                <tr>
+                  <th style="width:50px">No.</th>
+                  <th>รายการสินค้า / List of Products</th>
+                  <th style="width:90px">ปริมาณ</th>
+                  <th style="width:90px">หน่วย</th>
+                  <th style="width:130px">ราคาต่อหน่วย</th>
+                  <th style="width:130px">จำนวนเงิน</th>
+                </tr>
+              </thead>
+              <tbody id="printItemsBody"></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2"><strong>รวม <span id="printItemsCount">0</span> รายการ</strong></td>
+                  <td colspan="3">รวมมูลค่าสินค้า (บาท) TOTAL AMOUNT EXC.Vat</td>
+                  <td class="num" id="printSubtotal">0.00</td>
+                </tr>
+                <tr>
+                  <td colspan="5">ภาษีมูลค่าเพิ่ม (บาท) อัตรา <span id="printVatRate">7</span>% VAT</td>
+                  <td class="num" id="printVat">0.00</td>
+                </tr>
+                <tr>
+                  <td colspan="5"><strong>รวมเงินทั้งสิ้น (บาท) GRAND TOTAL</strong></td>
+                  <td class="num" id="printGrandTotal">0.00</td>
+                </tr>
+              </tfoot>
+            </table>
+
+            <div class="paper-total-text">รวมเงินทั้งสิ้น GRAND TOTAL : <strong id="printAmountText">ศูนย์บาทถ้วน</strong></div>
+
+            <div class="paper-terms">
+              <p><strong>เงื่อนไขการสั่งซื้อ</strong></p>
+              <p>1) กรุณาแจ้งคำสั่งซื้อและยืนยันภายใน 3 วันทำการ</p>
+              <p>2) ราคานี้ยังไม่รวมภาษีมูลค่าเพิ่ม 7% (หากไม่มีการระบุเป็นอย่างอื่น)</p>
+              <p>3) บริษัทขอสงวนสิทธิ์ในการเปลี่ยนแปลงราคาและเงื่อนไขโดยไม่ต้องแจ้งล่วงหน้า</p>
+              <p>4) กรุณาตรวจสอบรายละเอียดสินค้าและเงื่อนไขก่อนยืนยันคำสั่งซื้อทุกครั้ง</p>
+              <p><strong>เงื่อนไขการชำระเงิน:</strong> <span id="printPaymentMethod">-</span> / เครดิต <span id="printCreditTerm">-</span></p>
+            </div>
+
+            <div class="paper-sign">
+              <div class="sign-box">
+                <div class="line"></div>
+                <p>ผู้เสนอใบเสนอราคา</p>
+                <p id="printPreparedBy">-</p>
+              </div>
+              <div class="sign-box">
+                <div class="line"></div>
+                <p>ผู้มีอำนาจอนุมัติใบเสนอราคา</p>
+                <p id="printApproverName">-</p>
+              </div>
+            </div>
+          </section>
         </section>
 
         <section id="dashboardView" class="card hidden">

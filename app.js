@@ -23,6 +23,10 @@ const refs = {
   customerName: document.getElementById("customerName"),
   customerType: document.getElementById("customerType"),
   customerAddress: document.getElementById("customerAddress"),
+  customerTaxId: document.getElementById("customerTaxId"),
+  invoiceAddress: document.getElementById("invoiceAddress"),
+  projectName: document.getElementById("projectName"),
+  deliveryLocation: document.getElementById("deliveryLocation"),
   addCustomerBtn: document.getElementById("addCustomerBtn"),
   removeCustomerBtn: document.getElementById("removeCustomerBtn"),
   itemsBody: document.getElementById("itemsBody"),
@@ -59,7 +63,25 @@ const refs = {
   monthlyTotal: document.getElementById("monthlyTotal"),
   allCount: document.getElementById("allCount"),
   allTotal: document.getElementById("allTotal"),
-  quoteHistoryBody: document.getElementById("quoteHistoryBody")
+  quoteHistoryBody: document.getElementById("quoteHistoryBody"),
+  printCustomerName: document.getElementById("printCustomerName"),
+  printQuoteDate: document.getElementById("printQuoteDate"),
+  printQuoteNumber: document.getElementById("printQuoteNumber"),
+  printInvoiceAddress: document.getElementById("printInvoiceAddress"),
+  printProjectName: document.getElementById("printProjectName"),
+  printCustomerTaxId: document.getElementById("printCustomerTaxId"),
+  printDeliveryLocation: document.getElementById("printDeliveryLocation"),
+  printItemsBody: document.getElementById("printItemsBody"),
+  printItemsCount: document.getElementById("printItemsCount"),
+  printSubtotal: document.getElementById("printSubtotal"),
+  printVatRate: document.getElementById("printVatRate"),
+  printVat: document.getElementById("printVat"),
+  printGrandTotal: document.getElementById("printGrandTotal"),
+  printAmountText: document.getElementById("printAmountText"),
+  printPaymentMethod: document.getElementById("printPaymentMethod"),
+  printCreditTerm: document.getElementById("printCreditTerm"),
+  printPreparedBy: document.getElementById("printPreparedBy"),
+  printApproverName: document.getElementById("printApproverName")
 };
 
 const state = {
@@ -88,6 +110,18 @@ function formatMoney(value) {
 function parseNum(value) {
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
+}
+
+function formatDateDisplay(value) {
+  if (!value) return "-";
+  const [y, m, d] = value.split("-");
+  return y && m && d ? `${d}/${m}/${y}` : value;
+}
+
+function formatAmountText(value) {
+  const amount = parseNum(value);
+  if (amount <= 0) return "ศูนย์บาทถ้วน";
+  return `${formatMoney(amount)} บาทถ้วน`;
 }
 
 function ensureDefaultDate() {
@@ -228,6 +262,7 @@ function recalcTotals() {
 
   const hasAnyDiscount = state.items.some((item) => item.discount > 0) || agentDiscount > 0 || customerDiscount > 0;
   refs.quoteView.classList.toggle("hide-discount-print", !hasAnyDiscount);
+  syncPrintPreview();
 }
 
 function refreshSaleTypeUI() {
@@ -265,6 +300,11 @@ function fillCustomerFormById(id) {
   refs.customerName.value = customer.name;
   refs.customerType.value = customer.type;
   refs.customerAddress.value = customer.address;
+  refs.customerTaxId.value = customer.taxId || "";
+  refs.invoiceAddress.value = customer.invoiceAddress || customer.address || "";
+  refs.projectName.value = customer.projectName || "";
+  refs.deliveryLocation.value = customer.deliveryLocation || "";
+  syncPrintPreview();
 }
 
 function addOrUpdateCustomer() {
@@ -280,7 +320,11 @@ function addOrUpdateCustomer() {
     id: existing ? existing.id : `C${Date.now()}`,
     name,
     type: refs.customerType.value,
-    address: refs.customerAddress.value.trim()
+    address: refs.customerAddress.value.trim(),
+    taxId: refs.customerTaxId.value.trim(),
+    invoiceAddress: refs.invoiceAddress.value.trim(),
+    projectName: refs.projectName.value.trim(),
+    deliveryLocation: refs.deliveryLocation.value.trim()
   };
 
   const next = existing
@@ -299,9 +343,14 @@ function removeCustomer() {
   setCustomers(next);
   refs.customerName.value = "";
   refs.customerAddress.value = "";
+  refs.customerTaxId.value = "";
+  refs.invoiceAddress.value = "";
+  refs.projectName.value = "";
+  refs.deliveryLocation.value = "";
   refs.customerType.value = "general";
   refs.customerSelect.value = "";
   renderCustomers();
+  syncPrintPreview();
 }
 
 function getCounters() {
@@ -332,7 +381,11 @@ function buildQuotePayload() {
       id: refs.customerSelect.value,
       name: refs.customerName.value.trim(),
       type: refs.customerType.value,
-      address: refs.customerAddress.value.trim()
+      address: refs.customerAddress.value.trim(),
+      taxId: refs.customerTaxId.value.trim(),
+      invoiceAddress: refs.invoiceAddress.value.trim(),
+      projectName: refs.projectName.value.trim(),
+      deliveryLocation: refs.deliveryLocation.value.trim()
     },
     items: state.items,
     discounts: {
@@ -386,6 +439,7 @@ function resetForNextQuote() {
   buildItemRow();
   syncItemsFromTable();
   ensureDefaultDate();
+  syncPrintPreview();
 }
 
 function saveQuote() {
@@ -501,6 +555,72 @@ function wireEvents() {
 
   refs.saveQuoteBtn.addEventListener("click", saveQuote);
   refs.printBtn.addEventListener("click", () => window.print());
+
+  [
+    refs.quoteNumber,
+    refs.quoteDate,
+    refs.customerName,
+    refs.invoiceAddress,
+    refs.projectName,
+    refs.customerTaxId,
+    refs.deliveryLocation,
+    refs.paymentMethod,
+    refs.creditTerm,
+    refs.preparedBy,
+    refs.approverName
+  ].forEach((el) => el.addEventListener("input", syncPrintPreview));
+}
+
+function renderPrintItems() {
+  const rows = state.items.length ? state.items : [];
+  const minRows = 8;
+  refs.printItemsBody.innerHTML = "";
+
+  rows.forEach((item, index) => {
+    const tr = document.createElement("tr");
+    const cells = [
+      String(index + 1),
+      item.name || "-",
+      String(item.qty || 0),
+      "หน่วย",
+      formatMoney(item.price),
+      formatMoney(item.net)
+    ];
+    cells.forEach((text, cellIndex) => {
+      const td = document.createElement("td");
+      td.textContent = text;
+      if (cellIndex >= 2) td.style.textAlign = "right";
+      tr.appendChild(td);
+    });
+    refs.printItemsBody.appendChild(tr);
+  });
+
+  for (let i = rows.length; i < minRows; i += 1) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>&nbsp;</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>";
+    refs.printItemsBody.appendChild(tr);
+  }
+}
+
+function syncPrintPreview() {
+  refs.printCustomerName.textContent = refs.customerName.value.trim() || "-";
+  refs.printQuoteDate.textContent = formatDateDisplay(refs.quoteDate.value);
+  refs.printQuoteNumber.textContent = refs.quoteNumber.value.trim() || "-";
+  refs.printInvoiceAddress.textContent = refs.invoiceAddress.value.trim() || refs.customerAddress.value.trim() || "-";
+  refs.printProjectName.textContent = refs.projectName.value.trim() || "-";
+  refs.printCustomerTaxId.textContent = refs.customerTaxId.value.trim() || "-";
+  refs.printDeliveryLocation.textContent = refs.deliveryLocation.value.trim() || "-";
+  refs.printItemsCount.textContent = String(state.items.length);
+  refs.printSubtotal.textContent = formatMoney(state.totals.beforeVat);
+  refs.printVatRate.textContent = String(parseNum(refs.vatRate.value));
+  refs.printVat.textContent = formatMoney(state.totals.vat);
+  refs.printGrandTotal.textContent = formatMoney(state.totals.grandTotal);
+  refs.printAmountText.textContent = formatAmountText(state.totals.grandTotal);
+  refs.printPaymentMethod.textContent = refs.paymentMethod.value || "-";
+  refs.printCreditTerm.textContent = refs.creditTerm.value || "-";
+  refs.printPreparedBy.textContent = refs.preparedBy.value.trim() || "-";
+  refs.printApproverName.textContent = refs.approverName.value.trim() || "-";
+  renderPrintItems();
 }
 
 function bootstrap() {
@@ -511,6 +631,7 @@ function bootstrap() {
   syncItemsFromTable();
   refreshSaleTypeUI();
   renderDashboard();
+  syncPrintPreview();
 
   const savedUser = loadJSON(STORAGE_KEYS.user, "");
   if (savedUser) {
