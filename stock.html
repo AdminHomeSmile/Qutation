@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ระบบสต็อกสินค้า</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <section id="loginSection" class="card center-card">
+        <h1>ระบบสต็อกสินค้า</h1>
+        <p class="muted">เข้าสู่ระบบเพื่อจัดการสต็อก</p>
+        <div class="grid one">
+          <label>ชื่อผู้ใช้งาน
+            <input id="loginName" type="text" placeholder="เช่น Somchai คลังสินค้า" />
+          </label>
+          <button id="loginBtn" class="btn btn-primary">เข้าสู่ระบบ</button>
+        </div>
+        <p class="muted" style="text-align:center;margin-top:12px"><a href="index.html">← กลับหน้าหลัก</a></p>
+      </section>
+
+      <section id="mainSection" class="hidden">
+        <header class="topbar card">
+          <div>
+            <h2>ระบบสต็อกสินค้า</h2>
+            <p class="muted">ผู้ใช้งาน: <span id="currentUser">-</span></p>
+          </div>
+          <div class="actions">
+            <a href="quotation.html" class="btn">ไประบบใบเสนอราคา</a>
+            <button id="logoutBtn" class="btn btn-danger">ออกจากระบบ</button>
+          </div>
+        </header>
+
+        <section class="card">
+          <h3>ระบบจัดการสต็อก</h3>
+          <p class="muted">รองรับสินค้าเริ่มต้น Sealant LOCKSURE และสามารถเพิ่มสินค้าใหม่ได้ในอนาคต</p>
+
+          <section class="card soft">
+            <h4>สรุปสต็อกคงเหลือ</h4>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>สินค้า</th><th>คงเหลือ</th></tr>
+                </thead>
+                <tbody id="stockSummaryBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="card soft">
+            <h4>เพิ่มสต็อก</h4>
+            <div class="grid three">
+              <label>สินค้า
+                <select id="stockAddProduct"></select>
+              </label>
+              <label>เพิ่มสินค้าใหม่ (ถ้าต้องการ)
+                <input id="stockAddNewProduct" type="text" placeholder="เช่น Sealant รุ่นใหม่" />
+              </label>
+              <label>จำนวนที่เพิ่ม
+                <input id="stockAddQty" type="number" min="1" step="1" />
+              </label>
+              <label class="span-two">หมายเหตุ
+                <input id="stockAddNote" type="text" placeholder="เช่น รับเข้าสินค้ารอบใหม่" />
+              </label>
+            </div>
+            <button id="addStockBtn" class="btn btn-primary">บันทึกเพิ่มสต็อก</button>
+          </section>
+
+          <section class="card soft">
+            <h4>เบิก/หักสต็อก</h4>
+            <div class="grid three">
+              <label>สินค้า
+                <select id="stockWithdrawProduct"></select>
+              </label>
+              <label>จำนวนที่เบิก
+                <input id="stockWithdrawQty" type="number" min="1" step="1" />
+              </label>
+              <label>ชื่อผู้เบิก
+                <input id="stockWithdrawer" type="text" required />
+              </label>
+              <label>ชื่อลูกค้า
+                <input id="stockWithdrawCustomer" type="text" required />
+              </label>
+              <label>วัตถุประสงค์การเบิก
+                <input id="stockWithdrawPurpose" type="text" required />
+              </label>
+              <label>หมายเหตุ
+                <input id="stockWithdrawNote" type="text" placeholder="ไม่บังคับ" />
+              </label>
+            </div>
+            <button id="withdrawStockBtn" class="btn btn-primary">บันทึกการเบิก</button>
+          </section>
+
+          <section class="card soft">
+            <h4>รายงานธุรกรรมสต็อก</h4>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>วันเวลา</th>
+                    <th>ประเภท</th>
+                    <th>สินค้า</th>
+                    <th>จำนวน</th>
+                    <th>ผู้เบิก</th>
+                    <th>ลูกค้า</th>
+                    <th>วัตถุประสงค์</th>
+                    <th>หมายเหตุ</th>
+                  </tr>
+                </thead>
+                <tbody id="stockHistoryBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </section>
+    </div>
+
+    <script src="./common.js"></script>
+    <script src="./stock.js"></script>
+  </body>
+</html>
