@@ -795,7 +795,7 @@ function wireEvents() {
   refs.logoutBtn.addEventListener("click", () => setLoggedInUser(""));
   refs.tabQuote.addEventListener("click", showQuoteView);
   refs.tabDashboard.addEventListener("click", showDashboardView);
-  refs.tabStock.addEventListener("click", showStockView);
+  refs.tabStock.addEventListener("click", () => { window.location.href = "./stock.html"; });
   refs.saleType.addEventListener("change", refreshSaleTypeUI);
   refs.customerSelect.addEventListener("change", () => fillCustomerFormById(refs.customerSelect.value));
   refs.addCustomerBtn.addEventListener("click", addOrUpdateCustomer);
